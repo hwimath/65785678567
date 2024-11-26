@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>초등어휘 단어 게임</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #FFFAF0;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FF69B4;
+        }
+        .hidden {
+            display: none;
+        }
+        .section {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFF0F5;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 15px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #FF1493;
+        }
+        .quiz-option {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        #score {
+            font-size: 24px;
+            color: #32CD32;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✨ 초등어휘 단어 게임 ✨</h1>
+
+<div id="studySection" class="section">
+    <div id="studyContent">
+        <!-- Study content will be injected here -->
+    </div>
+    <button class="button" id="nextStudyBtn">다음</button>
+</div>
+
+<div id="quizSection" class="section hidden">
+    <h2>단어 퀴즈</h2>
+    <div id="quizContent">
+        <!-- Quiz content will be injected here -->
+    </div>
+    <button class="button" id="nextQuizBtn">다음</button>
+    <button class="button hidden" id="submitQuizBtn">제출</button>
+</div>
+
+<div id="scoreSection" class="section hidden">
+    <h2>🎉 점수 🎉</h2>
+    <p id="score">0 / 10</p>
+    <button class="button" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+    // 데이터 정의
+    const words = [
+        { word: "감추다", definition: "보이지 않게 숨기다." },
+        { word: "감히", definition: "두려움 없이 용감하게." },
+        { word: "갑작스럽다", definition: "예상하지 못하게 일이 벌어지는 상태이다." },
+        { word: "값싸다", definition: "가격이 저렴하다." },
+        { word: "강남", definition: "서울의 한 지역으로, 한강의 남쪽을 뜻한다." },
+        { word: "강도", definition: "강한 정도나 세기." },
+        { word: "강력하다", definition: "힘이나 영향이 매우 크고 세다." },
+        { word: "강력히", definition: "힘차고 강하게." },
+        { word: "강렬하다", definition: "매우 강하고 세차다." },
+        { word: "강변", definition: "강의 주변 지역." },
+        { word: "강북", definition: "서울의 한 지역으로, 한강의 북쪽을 뜻한다." },
+        { word: "강사", definition: "교육기관에서 가르치는 사람." }
+    ];
+
+    const sentences = {
+        "감추다": [
+            "그는 선물을 침대 밑에 감추었다.",
+            "나는 비밀을 감추고 싶지 않아요.",
+            "구름이 태양을 감추었다."
+        ],
+        "감히": [
+            "감히 나에게 그렇게 말하다니!",
+            "그는 감히 도전장을 내밀었다.",
+            "나는 감히 그 일을 시도해 보았다."
+        ],
+        "갑작스럽다": [
+            "갑작스러운 소나기가 내렸다.",
+            "그의 방문은 정말 갑작스러웠다.",
+            "갑작스러운 변화에 놀랐다."
+        ],
+        "값싸다": [
+            "이 물건은 품질도 좋고 값싸다.",
+            "값싼 옷을 샀어요.",
+            "이 식당은 맛있고 값싸서 좋아요."
+        ],
+        "강남": [
+            "강남에서 친구를 만났어요.",
+            "강남은 서울의 번화가 중 하나입니다.",
+            "우리는 강남으로 이사할 예정입니다."
+        ],
+        "강도": [
+            "운동의 강도를 높였다.",
+            "태풍의 강도가 약해졌다.",
+            "이 음악은 감정의 강도가 느껴진다."
+        ],
+        "강력하다": [
+            "그는 강력한 리더십을 가지고 있다.",
+            "이 약은 통증을 강력하게 완화한다.",
+            "강력한 바람이 불고 있다."
+        ],
+        "강력히": [
+            "나는 그 계획에 강력히 반대한다.",
+            "그는 범인을 강력히 의심했다.",
+            "우리는 문제 해결을 강력히 원한다."
+        ],
+        "강렬하다": [
+            "첫인상이 매우 강렬했다.",
+            "강렬한 햇빛이 내리쬐고 있다.",
+            "그 영화는 강렬한 감동을 주었다."
+        ],
+        "강변": [
+            "강변을 따라 산책을 했다.",
+            "강변에서 피크닉을 즐겼다.",
+            "강변에는 아름다운 꽃들이 피어 있다."
+        ],
+        "강북": [
+            "강북에는 역사적인 장소가 많다.",
+            "강북에서 맛있는 음식을 먹었다.",
+            "우리는 강북 지역을 여행했다."
+        ],
+        "강사": [
+            "그는 영어 강사로 일하고 있다.",
+            "학교에 새로운 강사가 왔다.",
+            "강사는 학생들에게 친절하다."
+        ]
+    };
+
+    const quizQuestions = [
+        {
+            question: "1. 그는 선물을 침대 밑에 ____.",
+            options: ["감추었다", "강렬했다"],
+            correctAnswer: "감추었다"
+        },
+        {
+            question: "2. 갑작스러운 소나기가 ____.",
+            options: ["내렸다", "강력했다"],
+            correctAnswer: "내렸다"
+        },
+        {
+            question: "3. 이 물건은 품질도 좋고 ____.",
+            options: ["값싸다", "강남이다"],
+            correctAnswer: "값싸다"
+        },
+        {
+            question: "4. 우리는 ____에서 친구를 만났다.",
+            options: ["강남", "강도"],
+            correctAnswer: "강남"
+        },
+        {
+            question: "5. 그는 그 계획에 ____ 반대했다.",
+            options: ["강력히", "감히"],
+            correctAnswer: "강력히"
+        },
+        {
+            question: "6. 첫인상이 매우 ____.",
+            options: ["강렬했다", "강변이었다"],
+            correctAnswer: "강렬했다"
+        },
+        {
+            question: "7. 우리는 ____을 따라 산책을 했다.",
+            options: ["강변", "강도"],
+            correctAnswer: "강변"
+        },
+        {
+            question: "8. 그는 영어 ____로 일하고 있다.",
+            options: ["강사", "강북"],
+            correctAnswer: "강사"
+        },
+        {
+            question: "9. 나는 그 일을 ____ 시도해 보았다.",
+            options: ["감히", "갑자기"],
+            correctAnswer: "감히"
+        },
+        {
+            question: "10. 태풍의 ____ 약해졌다.",
+            options: ["강도가", "강사가"],
+            correctAnswer: "강도가"
+        }
+    ];
+
+    // 상태 변수
+    let currentWordIndex = 0;
+    let currentQuizIndex = 0;
+    let score = 0;
+
+    // 초기화 함수
+    function showDefinition() {
+        if (currentWordIndex < words.length) {
+            const word = words[currentWordIndex];
+            document.getElementById('studyContent').innerHTML = `
+                <h2>단어 뜻 배우기</h2>
+                <h3>${word.word}</h3>
+                <p>${word.definition}</p>
+            `;
+        } else {
+            // 모든 단어 학습이 끝나면 퀴즈 시작
+            document.getElementById('studySection').classList.add('hidden');
+            initQuiz();
+            document.getElementById('quizSection').classList.remove('hidden');
+        }
+    }
+
+    function showSentences() {
+        const word = words[currentWordIndex];
+        const sentenceList = sentences[word.word];
+        let sentencesHTML = `<h2>예문 배우기</h2><h3>${word.word}</h3>`;
+        sentenceList.forEach(sentence => {
+            sentencesHTML += `<p>• ${sentence}</p>`;
+        });
+        document.getElementById('studyContent').innerHTML = sentencesHTML;
+    }
+
+    // 버튼 이벤트 리스너
+    document.getElementById('nextStudyBtn').addEventListener('click', () => {
+        if (document.getElementById('studyContent').innerHTML.includes('단어 뜻 배우기')) {
+            showSentences();
+        } else {
+            currentWordIndex++;
+            showDefinition();
+        }
+    });
+
+    // 퀴즈 함수
+    function initQuiz() {
+        if (currentQuizIndex < quizQuestions.length) {
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quizContent').innerHTML = `
+                <p>${q.question}</p>
+                ${q.options.map((option, index) => `
+                    <label class="quiz-option">
+                        <input type="radio" name="quiz${currentQuizIndex}" value="${option}">
+                        ${option}
+                    </label>
+                `).join('')}
+            `;
+            // Toggle buttons
+            if (currentQuizIndex === quizQuestions.length - 1) {
+                document.getElementById('nextQuizBtn').classList.add('hidden');
+                document.getElementById('submitQuizBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextQuizBtn').classList.remove('hidden');
+            }
+        }
+    }
+
+    document.getElementById('nextQuizBtn').addEventListener('click', () => {
+        const q = quizQuestions[currentQuizIndex];
+        const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+        if (selected) {
+            if (selected.value === q.correctAnswer) {
+                score++;
+            }
+            currentQuizIndex++;
+            initQuiz();
+        } else {
+            alert("답을 선택해주세요!");
+        }
+    });
+
+    document.getElementById('submitQuizBtn').addEventListener('click', () => {
+        const q = quizQuestions[currentQuizIndex];
+        const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+        if (selected) {
+            if (selected.value === q.correctAnswer) {
+                score++;
+            }
+            currentQuizIndex++;
+            showScore();
+        } else {
+            alert("답을 선택해주세요!");
+        }
+    });
+
+    function showScore() {
+        document.getElementById('quizSection').classList.add('hidden');
+        document.getElementById('score').innerText = `${score} / ${quizQuestions.length}`;
+        document.getElementById('scoreSection').classList.remove('hidden');
+    }
+
+    // 초기화 시작
+    showDefinition();
+</script>
+
+</body>
+</html>
